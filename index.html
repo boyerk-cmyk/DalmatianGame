@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dalmatian Day Reading Mystery</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fdf7f0;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1, h2, h3 {
+      text-align: center;
+      margin-top: 0.2em;
+    }
+
+    p {
+      line-height: 1.5;
+    }
+
+    .screen {
+      display: none;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .active-screen {
+      display: block;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    button {
+      padding: 8px 16px;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background: #ffcc33;
+      margin: 8px;
+    }
+
+    button:hover:not(:disabled) {
+      filter: brightness(1.05);
+    }
+
+    .big-button {
+      padding: 12px 22px;
+      font-size: 1.1rem;
+    }
+
+    button:disabled {
+      background: #dddddd;
+      color: #777777;
+      cursor: not-allowed;
+    }
+
+    input[type="text"] {
+      padding: 6px 8px;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #cccccc;
+      min-width: 220px;
+    }
+
+    /* STORY & QUESTIONS */
+    .story-box {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 12px 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+      margin-bottom: 16px;
+    }
+
+    .questions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .question-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 10px 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+      font-size: 0.95rem;
+    }
+
+    .question-card h4 {
+      margin: 0 0 6px 0;
+      font-size: 1rem;
+    }
+
+    .question-options label {
+      display: block;
+      margin-bottom: 4px;
+      cursor: pointer;
+    }
+
+    /* CLUE SCREEN */
+    .clue-box {
+      background: #fffbe5;
+      border-radius: 12px;
+      padding: 14px 18px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+      margin: 16px 0;
+      font-size: 1rem;
+    }
+
+    /* DOG BOARD / SHEETS */
+    .sheet-title {
+      text-align: center;
+      margin-top: 1.2em;
+      font-weight: bold;
+    }
+
+    .sheet-wrapper {
+      position: relative;
+      width: min(900px, 100%);
+      margin: 6px auto 0;
+    }
+
+    .sheet-img {
+      width: 100%;
+      display: block;
+    }
+
+    .sheet-grid {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      grid-auto-rows: 1fr;
+    }
+
+    .dog-box {
+      position: relative;
+      cursor: pointer;
+      border: 2px solid transparent;
+      background: rgba(255, 255, 255, 0);
+      user-select: none;
+    }
+
+    .dog-box.empty {
+      pointer-events: none;
+    }
+
+    .dog-box:hover {
+      border-color: rgba(0,0,0,0.15);
+    }
+
+    .dog-box.crossed::after {
+      content: "✖";
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.2vw;
+      max-font-size: 52px;
+      font-weight: bold;
+      color: rgba(200, 0, 0, 0.9);
+      pointer-events: none;
+    }
+
+    .controls {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .winner-message {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      min-height: 1.4em;
+      color: #2c6b2c;
+    }
+
+    .winner-message.error {
+      color: #b00020;
+    }
+
+    #titleImage {
+      max-width: 400px;
+      width: 80%;
+      display: block;
+      margin: 0 auto 16px;
+    }
+
+    .nav-buttons {
+      text-align: center;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- INTRO SCREEN -->
+  <section id="screen-intro" class="screen active-screen">
+    <img id="titleImage" src="ohno.png" alt="Oh no! Cruella is pretty angry!">
+    <h2>Oh No! The Dalmatian Puppies Have Run Away!</h2>
+    <p>
+      The puppies are hiding because they want to make sure there are
+      <strong>no more spotted fur coats</strong> ever again. One puppy was extra naughty
+      and ate all of Cruella’s fur coat sketches. Read the stories, solve the
+      questions, figure out the secret word on your clue sheet, and use the puppy
+      board to discover <strong>which Dalmatian did it</strong>.
+    </p>
+    <div class="center">
+      <button class="big-button" onclick="goToScreen('screen-story1')">
+        Start Story 1
+      </button>
+    </div>
+  </section>
+
+  <!-- STORY 1 -->
+  <section id="screen-story1" class="screen">
+    <h1>Story 1 – Super Pup</h1>
+    <p class="center">
+      Read <strong>“Super Pup”</strong>, answer the questions, and use the symbols
+      to build a secret word on your clue sheet.
+    </p>
+
+    <div class="center" style="margin-bottom:8px;">
+      <button onclick="readStory1()">🔊 Read Story 1 Aloud</button>
+    </div>
+
+    <div class="story-box">
+      <img src="superpup-story.png" alt="Super Pup story"
+           style="width:100%; max-width:800px; display:block; margin:0 auto 10px;">
+    </div>
+
+    <div class="questions-grid">
+      <div class="question-card">
+        <h4>1. Who is Super Pup?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="q1"> Teddy’s pet dog.</label>
+          <label><input type="radio" name="q1"> A cartoon dog who asks Teddy to help him solve a problem.</label>
+          <label><input type="radio" name="q1"> A cartoon dog Teddy saw in a new movie.</label>
+          <label><input type="radio" name="q1"> Teddy’s class pet.</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>2. What character trait could be used to describe Teddy?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="q2"> Scared</label>
+          <label><input type="radio" name="q2"> Brilliant</label>
+          <label><input type="radio" name="q2"> Excited</label>
+          <label><input type="radio" name="q2"> Confused</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>3. Which detail from the text best supports that trait?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="q3">
+            Teddy leaned forward, touched the screen, and was pulled inside the computer.</label>
+          <label><input type="radio" name="q3">
+            Soon, Teddy awoke in his own room.</label>
+          <label><input type="radio" name="q3">
+            Teddy pretended to be a reporter.</label>
+          <label><input type="radio" name="q3">
+            “Teddy! Wake up! I need your help!”</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>4. How does Teddy help President Jefferson?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="q4">
+            He balances the budget.</label>
+          <label><input type="radio" name="q4">
+            He goes with Super Pup to his bank to replace the missing money.</label>
+          <label><input type="radio" name="q4">
+            He goes with Super Pup to the bank to try to find the missing money.</label>
+          <label><input type="radio" name="q4">
+            He writes a book report for him.</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>5. How do Teddy and Super Pup go back in time?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="q5">
+            They use a rocket.</label>
+          <label><input type="radio" name="q5">
+            They jump inside Teddy’s computer.</label>
+          <label><input type="radio" name="q5">
+            They use President Jefferson’s time machine.</label>
+          <label><input type="radio" name="q5">
+            They use Super Pup’s time machine.</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="center" style="margin-top:16px;">
+      <button class="big-button" onclick="goToScreen('screen-clue1')">
+        Go to Clue 1
+      </button>
+    </div>
+  </section>
+
+  <!-- CLUE 1 -->
+  <section id="screen-clue1" class="screen">
+    <h1>Clue 1</h1>
+    <div class="clue-box">
+      <p>
+        Look at the secret word you built from Story 1 on your clue sheet.
+        It tells you something about how the naughty puppy’s <strong>face</strong> looks.
+      </p>
+      <p>
+        <strong>On the puppy board:</strong> Use your word to decide which faces
+        should be crossed out. Cross out every puppy whose face matches your clue.
+      </p>
+      <p>
+        Type your secret word below. When you get it correct, you can move on.
+      </p>
+    </div>
+
+    <div class="center" style="margin-top:8px;">
+      <input id="clue1Input" type="text" placeholder="Type your secret word">
+      <button onclick="checkClue(1)">Check Clue</button>
+    </div>
+    <div id="clue1Feedback" class="center" style="min-height:1.4em;"></div>
+
+    <div class="center">
+      <button id="clue1BoardBtn" class="big-button"
+              onclick="goToScreen('screen-board')" disabled>
+        Go to Puppy Board
+      </button>
+      <button id="clue1NextBtn"
+              onclick="goToScreen('screen-story2')" disabled>
+        Go to Story 2
+      </button>
+    </div>
+  </section>
+
+  <!-- PUPPY BOARD -->
+  <section id="screen-board" class="screen">
+    <h1>Dalmatian Mystery Board</h1>
+    <p class="center">
+      Use each clue from your clue sheet to cross out puppies that cannot be the naughty one.
+      Click a dog to put an <strong>X</strong> on it. Click again to remove the X.
+    </p>
+
+    <div class="sheet-title">Dog Sheet – Page 1</div>
+    <div class="sheet-wrapper">
+      <img src="dogs-page1.png" class="sheet-img" alt="Dalmatian sheet page 1">
+      <div class="sheet-grid" id="sheet1Grid"></div>
+    </div>
+
+    <div class="sheet-title">Dog Sheet – Page 2</div>
+    <div class="sheet-wrapper">
+      <img src="dogs-page2.png" class="sheet-img" alt="Dalmatian sheet page 2">
+      <div class="sheet-grid" id="sheet2Grid"></div>
+    </div>
+
+    <div class="controls">
+      <button onclick="clearAll()">Clear All X’s</button>
+      <button onclick="checkWinner()">Check Who Did It</button>
+    </div>
+
+    <div id="winnerMessage" class="winner-message"></div>
+
+    <div class="nav-buttons">
+      <p><strong>Read more stories to unlock more clues:</strong></p>
+      <button onclick="goToScreen('screen-story2')">Story 2</button>
+      <button onclick="goToScreen('screen-story3')">Story 3</button>
+      <button onclick="goToScreen('screen-story4')">Story 4</button>
+      <button onclick="goToScreen('screen-story5')">Story 5</button>
+      <button onclick="goToScreen('screen-story6')">Story 6</button>
+    </div>
+  </section>
+
+  <!-- STORY 2 -->
+  <section id="screen-story2" class="screen">
+    <h1>Story 2 – 230 Dalmatians</h1>
+    <p class="center">
+      Read <strong>“230 Dalmatians”</strong>, answer the questions, and use the symbols
+      to build your next secret word.
+    </p>
+
+    <div class="center" style="margin-bottom:8px;">
+      <button onclick="readStory2()">🔊 Read Story 2 Aloud</button>
+    </div>
+
+    <div class="story-box">
+      <img src="story2-230.png" alt="230 Dalmatians story"
+           style="width:100%; max-width:800px; display:block; margin:0 auto 10px;">
+    </div>
+
+    <div class="questions-grid">
+      <div class="question-card">
+        <h4>1. Which text feature is NOT found in the passage?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s2q1"> Photograph</label>
+          <label><input type="radio" name="s2q1"> Timeline</label>
+          <label><input type="radio" name="s2q1"> Flow chart</label>
+          <label><input type="radio" name="s2q1"> Glossary</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>2. Looking at the photograph, which caption would be best for “Caption 1”?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s2q2">
+            An adult Dalmatian feeding a puppy Dalmatian.</label>
+          <label><input type="radio" name="s2q2">
+            An adult Dalmatian and a puppy Dalmatian cuddling.</label>
+          <label><input type="radio" name="s2q2">
+            An adult Dalmatian and a puppy Dalmatian playing.</label>
+          <label><input type="radio" name="s2q2">
+            An adult Dalmatian and a puppy Dalmatian getting a bath.</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>3. Which text feature tells you when <em>102 Dalmatians</em> was released?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s2q3"> Map</label>
+          <label><input type="radio" name="s2q3"> Timeline</label>
+          <label><input type="radio" name="s2q3"> Italics</label>
+          <label><input type="radio" name="s2q3"> Glossary</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>4. Why are the words <em>The Hundred and One Dalmatians</em> in italics?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s2q4"> They are a movie title.</label>
+          <label><input type="radio" name="s2q4"> They are a song.</label>
+          <label><input type="radio" name="s2q4"> They are a computer game.</label>
+          <label><input type="radio" name="s2q4"> They are a book title.</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>5. Where did Dalmatians originate?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s2q5"> Croatia</label>
+          <label><input type="radio" name="s2q5"> London</label>
+          <label><input type="radio" name="s2q5"> California</label>
+          <label><input type="radio" name="s2q5"> United States</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="center" style="margin-top:16px;">
+      <button class="big-button" onclick="goToScreen('screen-clue2')">
+        Go to Clue 2
+      </button>
+    </div>
+  </section>
+
+  <!-- CLUE 2 -->
+  <section id="screen-clue2" class="screen">
+    <h1>Clue 2</h1>
+    <div class="clue-box">
+      <p>
+        Look at the second secret word you built from Story 2 on your clue sheet.
+        It tells you something about another kind of <strong>face</strong>.
+      </p>
+      <p>
+        <strong>On the puppy board:</strong> Use this new word to decide which
+        faces should be crossed out next. Cross out every puppy whose mouth or
+        expression matches your clue.
+      </p>
+      <p>
+        Type your secret word below to unlock the next part.
+      </p>
+    </div>
+
+    <div class="center" style="margin-top:8px;">
+      <input id="clue2Input" type="text" placeholder="Type your secret word">
+      <button onclick="checkClue(2)">Check Clue</button>
+    </div>
+    <div id="clue2Feedback" class="center" style="min-height:1.4em;"></div>
+
+    <div class="center">
+      <button id="clue2BoardBtn" class="big-button"
+              onclick="goToScreen('screen-board')" disabled>
+        Go to Puppy Board
+      </button>
+      <button id="clue2NextBtn"
+              onclick="goToScreen('screen-story3')" disabled>
+        Go to Story 3
+      </button>
+    </div>
+  </section>
+
+  <!-- STORY 3 -->
+  <section id="screen-story3" class="screen">
+    <h1>Story 3 – How Did That Taste</h1>
+    <p class="center">
+      Read <strong>“How Did That Taste”</strong>, answer the questions, and use
+      the symbols to build your third secret word.
+    </p>
+
+    <div class="center" style="margin-bottom:8px;">
+      <button onclick="readStory3()">🔊 Read Story 3 Aloud</button>
+    </div>
+
+    <div class="story-box">
+      <img src="story3-taste.png" alt="How Did That Taste story"
+           style="width:100%; max-width:800px; display:block; margin:0 auto 10px;">
+    </div>
+
+    <div class="questions-grid">
+      <div class="question-card">
+        <h4>1. What is the main idea of the text?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s3q1"> Spending time with dogs</label>
+          <label><input type="radio" name="s3q1"> A dog’s smell</label>
+          <label><input type="radio" name="s3q1"> How to care for dogs</label>
+          <label><input type="radio" name="s3q1"> A dog’s sense of taste</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>2. Why did the author include the picture?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s3q2"> It is cute.</label>
+          <label><input type="radio" name="s3q2"> It shows a dog.</label>
+          <label><input type="radio" name="s3q2"> It shows a dog using its taste buds.</label>
+          <label><input type="radio" name="s3q2"> It shows a dog using smell.</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>3. Which had the least amount of taste buds?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s3q3"> Cat</label>
+          <label><input type="radio" name="s3q3"> Dog</label>
+          <label><input type="radio" name="s3q3"> Shark</label>
+          <label><input type="radio" name="s3q3"> Goldfish</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>4. What are taste buds?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s3q4"> Stuff on a tongue.</label>
+          <label><input type="radio" name="s3q4"> Something that helps you hear.</label>
+          <label><input type="radio" name="s3q4"> Cells that help you taste.</label>
+          <label><input type="radio" name="s3q4"> Cells that help you smell.</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>5. Which detail supports the main idea?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s3q5"> Dogs are foodies.</label>
+          <label><input type="radio" name="s3q5">
+            Dogs have fewer taste buds than humans.</label>
+          <label><input type="radio" name="s3q5">
+            They can detect smells that you cannot.</label>
+          <label><input type="radio" name="s3q5"> Cats have 470 taste buds.</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>6. Which detail does NOT support the main idea?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s3q6">
+            They can detect smells that you cannot.</label>
+          <label><input type="radio" name="s3q6">
+            Dogs’ sense of taste is not as good as humans.</label>
+          <label><input type="radio" name="s3q6">
+            Dogs have taste buds in the roof of their mouth.</label>
+          <label><input type="radio" name="s3q6">
+            Dogs have about 1,700 taste buds.</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="center" style="margin-top:16px;">
+      <button class="big-button" onclick="goToScreen('screen-clue3')">
+        Go to Clue 3
+      </button>
+    </div>
+  </section>
+
+  <!-- CLUE 3 -->
+  <section id="screen-clue3" class="screen">
+    <h1>Clue 3</h1>
+    <div class="clue-box">
+      <p>
+        Look at your third secret word from Story 3.
+        This clue tells you whether the naughty puppy is a <strong>boy or a girl</strong>.
+      </p>
+      <p>
+        <strong>On the puppy board:</strong> Use your clue to decide which puppies
+        should be crossed out. Cross out every puppy whose type (boy or girl)
+        does NOT match your word.
+      </p>
+      <p>Type your secret word below.</p>
+    </div>
+
+    <div class="center" style="margin-top:8px;">
+      <input id="clue3Input" type="text" placeholder="Type your secret word">
+      <button onclick="checkClue(3)">Check Clue</button>
+    </div>
+    <div id="clue3Feedback" class="center" style="min-height:1.4em;"></div>
+
+    <div class="center">
+      <button id="clue3BoardBtn" class="big-button"
+              onclick="goToScreen('screen-board')" disabled>
+        Go to Puppy Board
+      </button>
+      <button id="clue3NextBtn"
+              onclick="goToScreen('screen-story4')" disabled>
+        Go to Story 4
+      </button>
+    </div>
+  </section>
+
+  <!-- STORY 4 -->
+  <section id="screen-story4" class="screen">
+    <h1>Story 4 – The Dog Visit</h1>
+    <p class="center">
+      Read <strong>“The Dog Visit”</strong>, answer the questions, and build your
+      fourth secret word.
+    </p>
+
+    <div class="center" style="margin-bottom:8px;">
+      <button onclick="readStory4()">🔊 Read Story 4 Aloud</button>
+    </div>
+
+    <div class="story-box">
+      <img src="story4-visit.png" alt="The Dog Visit story"
+           style="width:100%; max-width:800px; display:block; margin:0 auto 10px;">
+    </div>
+
+    <div class="questions-grid">
+      <div class="question-card">
+        <h4>1. What is another good title for this passage?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s4q1"> The Scary Dogs</label>
+          <label><input type="radio" name="s4q1"> A Dog’s Costume</label>
+          <label><input type="radio" name="s4q1"> Overcoming Dogs</label>
+          <label><input type="radio" name="s4q1"> I’m So Scared</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>2. What is a character trait to describe Bonnie?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s4q2"> Fearful</label>
+          <label><input type="radio" name="s4q2"> Calm</label>
+          <label><input type="radio" name="s4q2"> Courageous</label>
+          <label><input type="radio" name="s4q2"> Greedy</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>3. Why did the girls dress the dogs up?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s4q3"> It made the dogs look cute.</label>
+          <label><input type="radio" name="s4q3"> There was a contest.</label>
+          <label><input type="radio" name="s4q3"> The girls were going to take the dogs to the park.</label>
+          <label><input type="radio" name="s4q3"> Bonnie was scared.</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>4. What does the word <em>littered</em> mean?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s4q4"> Broken apart</label>
+          <label><input type="radio" name="s4q4"> Neat</label>
+          <label><input type="radio" name="s4q4"> Untidy</label>
+          <label><input type="radio" name="s4q4"> Put away</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>5. Which detail shows Bonnie’s mood?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s4q5">
+            Pet pictures hung everywhere, and dog toys littered the floors.</label>
+          <label><input type="radio" name="s4q5">
+            Madeline welcomed Bonnie with a tour of her house.</label>
+          <label><input type="radio" name="s4q5">
+            She showed Bonnie some dog clothes.</label>
+          <label><input type="radio" name="s4q5">
+            Bonnie figured that choosing dog clothes would be safe.</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="center" style="margin-top:16px;">
+      <button class="big-button" onclick="goToScreen('screen-clue4')">
+        Go to Clue 4
+      </button>
+    </div>
+  </section>
+
+  <!-- CLUE 4 -->
+  <section id="screen-clue4" class="screen">
+    <h1>Clue 4</h1>
+    <div class="clue-box">
+      <p>
+        Look at your fourth secret word from Story 4.
+        This clue tells you something about which <strong>side</strong> of the puppy’s
+        head the bow is on.
+      </p>
+      <p>
+        <strong>On the puppy board:</strong> Use your clue to decide which bows
+        are in the wrong place. Cross out any puppy whose bow position does
+        not match your word.
+      </p>
+      <p>Type your secret word below.</p>
+    </div>
+
+    <div class="center" style="margin-top:8px;">
+      <input id="clue4Input" type="text" placeholder="Type your secret word">
+      <button onclick="checkClue(4)">Check Clue</button>
+    </div>
+    <div id="clue4Feedback" class="center" style="min-height:1.4em;"></div>
+
+    <div class="center">
+      <button id="clue4BoardBtn" class="big-button"
+              onclick="goToScreen('screen-board')" disabled>
+        Go to Puppy Board
+      </button>
+      <button id="clue4NextBtn"
+              onclick="goToScreen('screen-story5')" disabled>
+        Go to Story 5
+      </button>
+    </div>
+  </section>
+
+  <!-- STORY 5 -->
+  <section id="screen-story5" class="screen">
+    <h1>Story 5 – The Wonder Dog</h1>
+    <p class="center">
+      Read <strong>“The Wonder Dog”</strong>, answer the questions, and build
+      your fifth secret word.
+    </p>
+
+    <div class="center" style="margin-bottom:8px;">
+      <button onclick="readStory5()">🔊 Read Story 5 Aloud</button>
+    </div>
+
+    <div class="story-box">
+      <img src="story5-wonder.png" alt="The Wonder Dog story"
+           style="width:100%; max-width:800px; display:block; margin:0 auto 10px;">
+    </div>
+
+    <div class="questions-grid">
+      <div class="question-card">
+        <h4>1. What is the main idea?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s5q1"> A family on vacation.</label>
+          <label><input type="radio" name="s5q1"> An amazing dog named Bobbie.</label>
+          <label><input type="radio" name="s5q1"> A dog who walked 2,500 miles.</label>
+          <label><input type="radio" name="s5q1"> A lost dog.</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>2. Why was the dog called “The Wonder Dog”?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s5q2"> He was found by a family on vacation.</label>
+          <label><input type="radio" name="s5q2"> A movie was made about him.</label>
+          <label><input type="radio" name="s5q2"> He accomplished something most people couldn’t.</label>
+          <label><input type="radio" name="s5q2"> He was a pretty dog.</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>3. What is the meaning of the word <em>ecstatic</em>?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s5q3"> Sad</label>
+          <label><input type="radio" name="s5q3"> Nervous</label>
+          <label><input type="radio" name="s5q3"> Lonely</label>
+          <label><input type="radio" name="s5q3"> Happy</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>4. How did the family most likely feel when they left Indiana?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s5q4"> Nervous</label>
+          <label><input type="radio" name="s5q4"> Sad</label>
+          <label><input type="radio" name="s5q4"> Ecstatic</label>
+          <label><input type="radio" name="s5q4"> Angry</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>5. How did the family know it was their dog?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s5q5"> It looked like him.</label>
+          <label><input type="radio" name="s5q5"> He had his collar on.</label>
+          <label><input type="radio" name="s5q5"> It had the same three scars.</label>
+          <label><input type="radio" name="s5q5"> It had the same fur color.</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>6. What does the word <em>resembled</em> mean?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s5q6"> Looked like</label>
+          <label><input type="radio" name="s5q6"> Tired</label>
+          <label><input type="radio" name="s5q6"> Matched</label>
+          <label><input type="radio" name="s5q6"> Sounded like</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="center" style="margin-top:16px;">
+      <button class="big-button" onclick="goToScreen('screen-clue5')">
+        Go to Clue 5
+      </button>
+    </div>
+  </section>
+
+  <!-- CLUE 5 -->
+  <section id="screen-clue5" class="screen">
+    <h1>Clue 5</h1>
+    <div class="clue-box">
+      <p>
+        Look at your fifth secret word from Story 5.
+        This clue tells you the <strong>color</strong> of the naughty puppy’s bow.
+      </p>
+      <p>
+        <strong>On the puppy board:</strong> Use your clue to decide which bow
+        color is correct. Cross out every puppy whose bow is a different color
+        than your word.
+      </p>
+      <p>Type your secret word below.</p>
+    </div>
+
+    <div class="center" style="margin-top:8px;">
+      <input id="clue5Input" type="text" placeholder="Type your secret word">
+      <button onclick="checkClue(5)">Check Clue</button>
+    </div>
+    <div id="clue5Feedback" class="center" style="min-height:1.4em;"></div>
+
+    <div class="center">
+      <button id="clue5BoardBtn" class="big-button"
+              onclick="goToScreen('screen-board')" disabled>
+        Go to Puppy Board
+      </button>
+      <button id="clue5NextBtn"
+              onclick="goToScreen('screen-story6')" disabled>
+        Go to Story 6
+      </button>
+    </div>
+  </section>
+
+  <!-- STORY 6 -->
+  <section id="screen-story6" class="screen">
+    <h1>Story 6 – Amazing Service Dogs</h1>
+    <p class="center">
+      Read <strong>“Amazing Service Dogs”</strong>, answer the questions, and build
+      your sixth secret word.
+    </p>
+
+    <div class="center" style="margin-bottom:8px;">
+      <button onclick="readStory6()">🔊 Read Story 6 Aloud</button>
+    </div>
+
+    <div class="story-box">
+      <img src="story6-service.png" alt="Amazing Service Dogs story"
+           style="width:100%; max-width:800px; display:block; margin:0 auto 10px;">
+    </div>
+
+    <div class="questions-grid">
+
+      <div class="question-card">
+        <h4>1. How can you easily identify a service dog?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s6q1"> Its leash</label>
+          <label><input type="radio" name="s6q1"> Its vest</label>
+          <label><input type="radio" name="s6q1"> Its breed</label>
+          <label><input type="radio" name="s6q1"> Its name</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>2. All of the following are important for a service dog EXCEPT:</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s6q2"> Healthy</label>
+          <label><input type="radio" name="s6q2"> Good attitude</label>
+          <label><input type="radio" name="s6q2"> Easy to train</label>
+          <label><input type="radio" name="s6q2"> Certain breed</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>3. How long are service dogs trained?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s6q3"> Two years</label>
+          <label><input type="radio" name="s6q3"> Six years</label>
+          <label><input type="radio" name="s6q3"> Eight years</label>
+          <label><input type="radio" name="s6q3"> Five years</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>4. What is the main idea of the article?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s6q4"> Service dogs are special.</label>
+          <label><input type="radio" name="s6q4"> How to train a service dog.</label>
+          <label><input type="radio" name="s6q4"> Who can be a service dog.</label>
+          <label><input type="radio" name="s6q4"> Where to buy a service dog.</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>5. Which detail is NOT a detail to support the main idea?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s6q5"> Some service dogs can dial 911.</label>
+          <label><input type="radio" name="s6q5"> Any dog can become a service dog.</label>
+          <label><input type="radio" name="s6q5"> They can help their owners become independent.</label>
+          <label><input type="radio" name="s6q5"> Only kids can own a service dog.</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>6. What is most likely a reason the author wrote this passage?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s6q6"> To entertain the reader with a story about a dog.</label>
+          <label><input type="radio" name="s6q6"> To persuade the reader to purchase a dog.</label>
+          <label><input type="radio" name="s6q6"> To inform the reader about service dogs.</label>
+          <label><input type="radio" name="s6q6"> To inform the reader how to train a service dog.</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>7. Which dog breed is NOT a common type of service dog?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s6q7"> Labrador Retrievers</label>
+          <label><input type="radio" name="s6q7"> German Shepherds</label>
+          <label><input type="radio" name="s6q7"> Golden Doodles</label>
+          <label><input type="radio" name="s6q7"> Golden Retrievers</label>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <h4>8. Why did the author include the photograph?</h4>
+        <div class="question-options">
+          <label><input type="radio" name="s6q8"> To show service dogs with kids.</label>
+          <label><input type="radio" name="s6q8"> To show service dogs eating.</label>
+          <label><input type="radio" name="s6q8"> To show service dogs sleeping.</label>
+          <label><input type="radio" name="s6q8"> To show service dogs helping.</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="center" style="margin-top:16px;">
+      <button class="big-button" onclick="goToScreen('screen-clue6')">
+        Go to Clue 6
+      </button>
+    </div>
+  </section>
+
+  <!-- CLUE 6 -->
+  <section id="screen-clue6" class="screen">
+    <h1>Clue 6</h1>
+    <div class="clue-box">
+      <p>
+        Look at your sixth secret word from Story 6.
+        This clue tells you something about the <strong>name</strong> of the naughty puppy.
+      </p>
+      <p>
+        <strong>On the puppy board:</strong> Use your clue to decide how long the
+        puppy’s name should be. Cross out any remaining puppy whose name does
+        not match your clue about the number of letters.
+      </p>
+      <p>Type your secret word below to finish the mystery.</p>
+    </div>
+
+    <div class="center" style="margin-top:8px;">
+      <input id="clue6Input" type="text" placeholder="Type your secret word">
+      <button onclick="checkClue(6)">Check Clue</button>
+    </div>
+    <div id="clue6Feedback" class="center" style="min-height:1.4em;"></div>
+
+    <div class="center">
+      <button id="clue6BoardBtn" class="big-button"
+              onclick="goToScreen('screen-board')" disabled>
+        Go to Puppy Board and Finish the Mystery
+      </button>
+    </div>
+  </section>
+
+  <script>
+    // ---------- SCREEN NAVIGATION ----------
+    function goToScreen(id) {
+      document.querySelectorAll('.screen').forEach(sec => {
+        sec.classList.remove('active-screen');
+      });
+      document.getElementById(id).classList.add('active-screen');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ---------- DOG BOARD SETUP ----------
+    const page1Dogs = [
+      "Patch","Cadpig","Penny","Lucky","Rolly","Blackie","Lenny","Salter",
+      "Lucky","Tiger","Wags","Lady","Shark","Mimi","Jolly","Blot",
+      "Pepper","Two-Tone","Freckles","Jewel","Whity","Whizzer","Blob","Dot",
+      "Yoyo","Sport","Corky","Spanky","Latch","Sleepy","Nosey","Speedy",
+      "Swifty","Bluey","Dipper","Pokey","Smokey","Bravo","Flapper","Puddles",
+      "Rover","Spotty","Tabby","Bolt","Rexx","Dusty","Sweetie","Sporty",
+      "Polka","Leo","Stella","Archie","Inkie","Richie","Gracie","Oreo"
+    ];
+
+    const page2Dogs = [
+      "Rocky","Anita","Muddy","Tia","Domino","Zoey","Romeo","Chi Chi",
+      "Checkers","Comet","Ace","Cleo","Milo","Jack","Cookie","Max",
+      "Minnie","Peanut","Copper","Dolly","Pat Pat","Leo","Buddy","Dixie",
+      "Gizmo","Bear","Pearl","Duke","Pollie","Bruno","Teddy","Sadie",
+      "Spike","Bo","Maggie","Rusty","Koda","Bandit","Poppy","Sam",
+      "Rascal","Mia","Blue","Harry","Ginger","Oscar","Gus","Roxy",
+      "Cosmo","Biscuit","Star","Lola","Casper","Daisy","Ace","Boo",
+      "Pongo","Perdita"
+    ];
+
+    while (page2Dogs.length % 8 !== 0) {
+      page2Dogs.push("");
+    }
+
+    function buildSheet(gridId, dogNames) {
+      const grid = document.getElementById(gridId);
+      dogNames.forEach(name => {
+        const box = document.createElement("div");
+        if (!name) {
+          box.className = "dog-box empty";
+          grid.appendChild(box);
+          return;
+        }
+        box.className = "dog-box";
+        box.dataset.name = name;
+        box.innerHTML = '<span style="font-size:8px;opacity:0;">' + name + '</span>';
+        box.addEventListener("click", () => {
+          box.classList.toggle("crossed");
+        });
+        grid.appendChild(box);
+      });
+    }
+
+    function clearAll() {
+      document.getElementById("winnerMessage").textContent = "";
+      document.getElementById("winnerMessage").className = "winner-message";
+      document.querySelectorAll(".dog-box").forEach(box => {
+        box.classList.remove("crossed");
+      });
+    }
+
+    function normaliseName(name) {
+      return name.toLowerCase().replace(/\s+/g, "");
+    }
+
+    const CORRECT_DOG = "pollie";
+
+    function checkWinner() {
+      const boxes = Array.from(
+        document.querySelectorAll(".dog-box:not(.empty)")
+      );
+      const notCrossed = boxes.filter(
+        b => !b.classList.contains("crossed")
+      );
+
+      const msg = document.getElementById("winnerMessage");
+
+      if (notCrossed.length === 1 &&
+          normaliseName(notCrossed[0].dataset.name) === CORRECT_DOG) {
+        msg.textContent =
+          "You got it! Pollie is the puppy who ate the fur coat sketches!";
+        msg.className = "winner-message";
+      } else {
+        msg.textContent =
+          "Not yet! Keep using your clues and cross out more dogs until only one puppy is left.";
+        msg.className = "winner-message error";
+      }
+    }
+
+    // ---------- CLUE CHECKING ----------
+    const clueAnswers = {
+      1: ["happy"],                 // Clue 1
+      2: ["frown","frowns"],        // Clue 2
+      3: ["boydog"],                // Clue 3 ("boy dog")
+      4: ["right"],                 // Clue 4
+      5: ["yellow"],                // Clue 5
+      6: ["6letters","sixletters"]  // Clue 6 ("6 letters")
+    };
+
+    function checkClue(n) {
+      const inputEl = document.getElementById(`clue${n}Input`);
+      const feedbackEl = document.getElementById(`clue${n}Feedback`);
+      const boardBtn = document.getElementById(`clue${n}BoardBtn`);
+      const nextBtn = document.getElementById(`clue${n}NextBtn`);
+
+      const raw = (inputEl.value || "").trim().toLowerCase();
+      const normalised = raw.replace(/\s+/g, "");
+
+      const answers = clueAnswers[n] || [];
+      const correct = answers.some(a => a === normalised);
+
+      if (correct) {
+        feedbackEl.textContent = "Great! Your clue matches your sheet.";
+        feedbackEl.style.color = "#2c6b2c";
+        if (boardBtn) boardBtn.disabled = false;
+        if (nextBtn) nextBtn.disabled = false;
+      } else {
+        feedbackEl.textContent = "Hmm, try again. Check your clue sheet and spelling.";
+        feedbackEl.style.color = "#b00020";
+        // Keep buttons disabled
+        if (boardBtn) boardBtn.disabled = true;
+        if (nextBtn) nextBtn.disabled = true;
+      }
+    }
+
+    // ---------- READ-ALOUD (TTS) ----------
+    const story1Text = `Teddy sat at his computer, trying to finish his book report. A cartoon dog on the screen suddenly talked to him and pulled him into the computer. The dog, Super Pup, needed Teddy’s help to travel back in time and protect the money for the Louisiana Purchase. They used a time machine, visited a bank in 1803, and discovered that the bank president had a secret drawer of money. After solving the problem, Teddy woke up back in his room and saw that his report on Jefferson was finished. He wondered if it had all been a dream.`;
+
+    const story2Text = `The passage explains how the movie One Hundred and One Dalmatians was made. It says that about two hundred thirty Dalmatian puppies and several adult dogs were used in the movie. Puppies grow quickly, so new puppies were needed every few weeks to keep them looking the same age. Trainers used food, fun, and toys to teach the puppies their tricks. The movie was filmed in London, and when it was finished many crew members adopted the puppies.`;
+
+    const story3Text = `The passage compares a dog’s sense of taste with a human’s. Dogs cannot taste as well as people because they have fewer taste buds. Taste buds are groups of cells that let us know whether food is sweet, salty, sour, bitter, or savory. Humans have about nine thousand taste buds, but dogs have around one thousand seven hundred. Cats have even fewer, about four hundred seventy. That is why dogs and cats do not care as much about how food tastes as people do.`;
+
+    const story4Text = `Bonnie and Madeline are cousins in third grade. Bonnie is nervous to visit Madeline’s new house because she is afraid of dogs, and Madeline has two. Madeline loves animals and has pet pictures and dog toys all over her house. She introduces Bonnie to her dogs, Patches and Oreo. When Patches brings over a tug toy, Bonnie freezes and says she is not good with dogs. Madeline has an idea. She suggests dressing the dogs in costumes for a doggy dress-up day at the park. Bonnie chooses a blue shark costume for Oreo and a ballerina tutu for Patches. As they dress the dogs, Bonnie feels more comfortable. The dogs look so cute that she is no longer afraid.`;
+
+    const story5Text = `Bobbie the Wonder Dog was a real dog who did something amazing. In the 1920s his family drove from Oregon to Indiana. When it was time to go home, Bobbie was lost. The family searched but could not find him and sadly drove back to Oregon without their dog. Nine months later, a tired, dirty dog showed up at their house. At first they were not sure it was Bobbie, but then they noticed that he had the same three scars. Bobbie had walked about twenty seven hundred miles to get home. Newspapers told his story and he became famous, but Bobbie was probably just happy to be back with his family.`;
+
+    const story6Text = `Service dogs are special dogs that are trained to help people with disabilities. Any kind of dog can become a service dog if it is healthy, has a good attitude, and is easy to train. Service dogs learn many jobs. They can bring medicine, open doors, pick up dropped keys, wake up their owners, and some can even dial nine one one. Training a service dog can take years. Service dogs wear leashes and vests so people can tell what they are. They are allowed in stores, restaurants, hotels, airplanes, and many other places. Service dogs help their owners feel safe and independent every day.`;
+
+    function readStory(text) {
+      const utter = new SpeechSynthesisUtterance(text);
+      const voices = window.speechSynthesis.getVoices();
+      const pick = voices.find(v =>
+        v.name.includes("Female") || v.name.includes("Samantha")
+      );
+      if (pick) utter.voice = pick;
+      utter.rate = 1.0;
+      utter.pitch = 1.05;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utter);
+    }
+
+    function readStory1() { readStory(story1Text); }
+    function readStory2() { readStory(story2Text); }
+    function readStory3() { readStory(story3Text); }
+    function readStory4() { readStory(story4Text); }
+    function readStory5() { readStory(story5Text); }
+    function readStory6() { readStory(story6Text); }
+
+    // ---------- INIT ----------
+    window.addEventListener("load", () => {
+      buildSheet("sheet1Grid", page1Dogs);
+      buildSheet("sheet2Grid", page2Dogs);
+    });
+  </script>
+</body>
+</html>
